@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\League;
+use App\Country;
+use App\Continent;
 use Illuminate\Http\Request;
 use Auth;
 
@@ -15,12 +17,25 @@ class LeagueController extends Controller
      */
     public function all()
     {
-        return response()->json(League::all());
+        $retval=[];
+        foreach(League::all() as $league){
+            $country=Country::find($league->country_id);
+            $continent=Continent::find($country->continent_id);
+            $league['country']=$country;
+            $country['continent']=$continent;
+            array_push($retval, $league);
+        }
+        return response()->json($retval);
     }
 
     public function get($id)
     {
-        return response()->json(League::find($id));
+        $league=League::find($id);
+        $country=Country::find($league->country_id);
+        $continent=Continent::find($country->continent_id);
+        $league['country']=$country;
+        $country['continent']=$continent;
+        return response()->json($league);
     }
 
     public function create(Request $request)

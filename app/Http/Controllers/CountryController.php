@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Country;
+use App\Continent;
 use Illuminate\Http\Request;
 use Auth;
 
@@ -15,12 +16,21 @@ class CountryController extends Controller
      */
     public function all()
     {
-        return response()->json(Country::all());
+        $retval=[];
+        foreach(Country::all() as $country){
+            $continent=Continent::find($country->continent_id);
+            $country['continent']=$continent;
+            array_push($retval, $country);
+        }
+        return response()->json($retval);
     }
 
     public function get($id)
     {
-        return response()->json(Country::find($id));
+        $country=Country::find($id);
+        $continent=Continent::find($country->continent_id);
+        $country['continent']=$continent;
+        return response()->json($country);
     }
 
     public function create(Request $request)
